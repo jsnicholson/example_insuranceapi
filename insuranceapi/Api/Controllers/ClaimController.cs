@@ -1,4 +1,5 @@
 ﻿using Api.Models;
+using AutoMapper;
 using Data.Entities;
 using Data.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,11 +10,23 @@ namespace Api.Controllers {
     [Route("api/[controller]")]
     public class ClaimController : ControllerBase {
         private readonly ILogger _logger;
+        private readonly IMapper _mapper;
         private readonly IClaimRepository _claimRepository;
 
-        public ClaimController(ILogger<ClaimController> logger, IClaimRepository claimRepository) {
+        public ClaimController(ILogger<ClaimController> logger, IMapper mapper, IClaimRepository claimRepository) {
             _logger = logger;
+            _mapper = mapper;
             _claimRepository = claimRepository;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> CreateClaim([FromBody] CreateClaimRequest requestClaim) {
+            _logger.LogInformation($"{HttpContext.Request.Path.Value} received claim:{requestClaim}");
+            if (requestClaim == null) return BadRequest("Must provide Claim");
+
+            await _claimRepository.CreateClaimAsync(_mapper.Map<Claim>(requestClaim));
+
+            return Created();
         }
 
         [HttpGet]
@@ -23,7 +36,7 @@ namespace Api.Controllers {
 
             if(claims == null || !claims.Any()) {
                 _logger.LogInformation($"{HttpContext.Request.Path.Value} no claims were found");
-                return NotFound();
+                return NotFound("No claims found");
             }
 
             _logger.LogInformation($"{HttpContext.Request.Path.Value} responding:{JsonSerializer.Serialize(claims)}");
@@ -37,7 +50,7 @@ namespace Api.Controllers {
 
             if (claim == null) {
                 _logger.LogInformation($"{HttpContext.Request.Path.Value} uniqueClaimReference '{uniqueClaimReference}' found no claim");
-                return NotFound();
+                return NotFound("No claims found");
             }
 
             var response = new GetClaimResponse(claim);
@@ -46,7 +59,16 @@ namespace Api.Controllers {
         }
 
         [HttpPatch("{uniqueClaimReference}")]
-        public async Task<IActionResult> UpdateClaim([FromRoute] string uniqueClaimReference, [FromBody] ClaimController updatedClaim) {
+        public async Task<ActionResult> UpdateClaim([FromRoute] string uniqueClaimReference, [FromBody] UpdateClaimRequest requestUpdateClaim) {
+            _logger.LogInformation($"{HttpContext.Request.Path.Value} received requestUpdateClaim:{requestUpdateClaim}");
+            var claim = await _claimRepository.GetClaimAsync(uniqueClaimReference);
+            
+            if (claim == null) return BadRequest("Claim does not exist");
+
+            requestUpdateClaim.Update(ref claim);
+
+            await _claimRepository.UpdateClaimAsync(claim);
+
             return Ok();
         }
     }

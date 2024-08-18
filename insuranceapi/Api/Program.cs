@@ -1,5 +1,7 @@
 using Api;
 using Api.Exceptions;
+using Api.Handler;
+using Api.Mapping;
 using Data;
 using Data.Repositories;
 using Data.Repositories.Interfaces;
@@ -12,8 +14,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString(Constants.Config.INSURANCECONNECTION)));
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
+builder.Services.AddTransient<GlobalExceptionHandler>();
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 
 builder.Services.AddControllers(config => {
     // disabled for now
@@ -48,6 +52,8 @@ using(var scope = app.Services.CreateScope()) {
         dbContext.SaveChanges();
     }
 }
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

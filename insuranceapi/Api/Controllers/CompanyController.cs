@@ -19,6 +19,16 @@ namespace Api.Controllers {
             _claimRepository = claimRepository;
         }
 
+        [HttpPost]
+        public async Task<ActionResult> CreateCompany([FromBody] Company requestCompany) {
+            _logger.LogInformation($"{HttpContext.Request.Path.Value} received company:{requestCompany}");
+            if (requestCompany == null) return BadRequest("Must provide Company");
+
+            await _companyRepository.CreateCompanyAsync(requestCompany);
+
+            return Created();
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Company>>> Get() {
             _logger.LogInformation($"{HttpContext.Request.Path.Value}");
@@ -26,7 +36,7 @@ namespace Api.Controllers {
 
             if(companies == null || !companies.Any()) {
                 _logger.LogInformation($"{HttpContext.Request.Path.Value} no companies were found");
-                return NotFound();
+                return NotFound("No companies found");
             }
 
             _logger.LogInformation($"{HttpContext.Request.Path.Value} responding:{JsonSerializer.Serialize(companies)}");
@@ -40,7 +50,7 @@ namespace Api.Controllers {
 
             if (company == null) {
                 _logger.LogInformation($"{HttpContext.Request.Path.Value} companyId '{companyId}' was not found");
-                return NotFound();
+                return NotFound("No companies found");
             }
 
             var response = new GetCompanyResponse(company);
@@ -55,7 +65,7 @@ namespace Api.Controllers {
 
             if (company == null) {
                 _logger.LogInformation($"{HttpContext.Request.Path.Value} companyName '{companyName}' was not found");
-                return NotFound();
+                return NotFound("No companies found");
             }
 
             var response = new GetCompanyResponse(company);
@@ -66,25 +76,15 @@ namespace Api.Controllers {
         [HttpGet("{companyId}/claims")]
         public async Task<ActionResult<IEnumerable<Claim>>> GetClaims(int companyId) {
             _logger.LogInformation($"{HttpContext.Request.Path.Value} received companyId:{companyId}");
-            var claims = await _claimRepository.GetClaimsForCompany(companyId);
+            var claims = await _claimRepository.GetClaimsForCompanyAsync(companyId);
 
             if(claims == null || !claims.Any()) {
                 _logger.LogInformation($"{HttpContext.Request.Path.Value} companyId '{companyId}' found no claims");
-                return NotFound();
+                return NotFound("No claims found");
             }
 
             _logger.LogInformation($"{HttpContext.Request.Path.Value} response:{JsonSerializer.Serialize(claims)}");
             return Ok(claims);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateCompany([FromBody] Company requestCompany) {
-            _logger.LogInformation($"{HttpContext.Request.Path.Value} received company:{requestCompany}");
-            if(requestCompany == null ) return BadRequest("Must provide Company");
-
-            await _companyRepository.CreateCompanyAsync(requestCompany);
-
-            return Created();
         }
     }
 }

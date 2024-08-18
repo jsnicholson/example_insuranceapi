@@ -2,7 +2,10 @@
 using System.Net;
 
 namespace Api.Exceptions {
-    // could use an exceptionfilterattribute if not all controllers want it
+    /// <summary>
+    /// Any unhandled exceptions occurring in a decoared class will be captured here
+    /// This allows consistent formatting back to consumer
+    /// </summary>
     public class GlobalExceptionHandler : IExceptionHandler {
         private readonly ILogger _logger;
         private readonly IWebHostEnvironment _environment;
@@ -12,16 +15,22 @@ namespace Api.Exceptions {
             _environment = environment;
         }
 
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken) {
-            _logger.LogError($"exception occurred | message:{exception.Message} trace:{exception.StackTrace}");
+        public virtual async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken) {
+            _logger.LogError($"an exception occurred on {httpContext.Request.Path.Value} exception:{exception.Message} trace:{exception.StackTrace}");
 
-            if (_environment.IsDevelopment()) {
-                httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                await httpContext.Response.WriteAsJsonAsync(new { }, cancellationToken);
-            } else {
-                httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                await httpContext.Response.WriteAsJsonAsync("An error has occurred", cancellationToken);
-            }
+            httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            object responseBody = 
+                (_environment.IsDevelopment()) ? 
+                    new {
+                        message = exception.Message,
+                        stackTrace = exception.StackTrace,
+                        innerMessage = exception.InnerException?.Message,
+                        innerStackTrace = exception.InnerException?.StackTrace
+                    }
+                : "An unexpected error occurred";
+
+            await httpContext.Response.WriteAsJsonAsync(responseBody, cancellationToken);
 
             return true;
         }

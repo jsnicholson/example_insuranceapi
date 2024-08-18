@@ -13,6 +13,16 @@ namespace Data.Repositories {
             _context = context;
         }
 
+        public async Task CreateClaimAsync(Claim claim) {
+            _context.Claims.Add(claim);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CreateClaimAsync(IEnumerable<Claim> claims) {
+            _context.Claims.AddRange(claims);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Claim>> GetAllClaimsAsync() {
             return await _context.Claims.ToListAsync();
         }
@@ -30,7 +40,7 @@ namespace Data.Repositories {
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Claim>> GetClaimsForCompany(int companyId) {
+        public async Task<IEnumerable<Claim>> GetClaimsForCompanyAsync(int companyId) {
             return await _context.Claims.Where(c => c.CompanyId == companyId).ToListAsync();
         }
     }
