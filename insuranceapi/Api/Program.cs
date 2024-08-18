@@ -28,6 +28,7 @@ builder.Services.AddControllers(config => {
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
     options.CustomSchemaIds(type => type.FullName);
+    options.EnableAnnotations();
 });
 
 var app = builder.Build();

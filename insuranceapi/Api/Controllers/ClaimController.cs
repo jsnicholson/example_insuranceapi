@@ -3,6 +3,7 @@ using AutoMapper;
 using Data.Entities;
 using Data.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Text.Json;
 
 namespace Api.Controllers {
@@ -58,7 +59,18 @@ namespace Api.Controllers {
             return Ok(response);
         }
 
+        /// <summary>
+        /// Update a claim based on reference
+        /// </summary>
+        /// <remarks>Only provide the fields you want to update</remarks>
+        /// <param name="uniqueClaimReference"></param>
+        /// <param name="requestUpdateClaim"></param>
+        /// <returns></returns>
         [HttpPatch("{uniqueClaimReference}")]
+        [SwaggerOperation(
+            Summary = "Update a claim based on reference",
+            Description = "Only provide the fields you want to update"
+        )]
         public async Task<ActionResult> UpdateClaim([FromRoute] string uniqueClaimReference, [FromBody] UpdateClaimRequest requestUpdateClaim) {
             _logger.LogInformation($"{HttpContext.Request.Path.Value} received requestUpdateClaim:{requestUpdateClaim}");
             var claim = await _claimRepository.GetClaimAsync(uniqueClaimReference);
