@@ -6,5 +6,6 @@ namespace Data.Repositories.Interfaces {
         Task<IEnumerable<Claim>> GetClaimsAsync(IEnumerable<string> claimIds);
         Task<IEnumerable<Claim>> GetAllClaimsAsync();
         Task UpdateClaimAsync(Claim claim);
+        Task<IEnumerable<Claim>> GetClaimsForCompany(int companyId);
     }
 }

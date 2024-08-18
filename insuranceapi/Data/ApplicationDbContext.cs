@@ -8,14 +8,5 @@ namespace Data {
         public virtual DbSet<ClaimType> ClaimTypes { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder) {
-            base.OnModelCreating(modelBuilder);
-            SeedData(modelBuilder);
-        }
-
-        protected void SeedData(ModelBuilder modelBuilder) {
-
-        }
     }
 }

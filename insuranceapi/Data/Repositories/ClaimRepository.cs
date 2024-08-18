@@ -29,5 +29,9 @@ namespace Data.Repositories {
             _context.Claims.Update(claim);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Claim>> GetClaimsForCompany(int companyId) {
+            return await _context.Claims.Where(c => c.CompanyId == companyId).ToListAsync();
+        }
     }
 }
