@@ -11,13 +11,13 @@ namespace Api.Controllers {
             _logger = logger;
         }
 
-        [HttpGet("{ucr}")]
-        public async Task<ActionResult<GetClaimResponse>> Get(string ucr) {
+        [HttpGet("{uniqueClaimReference}")]
+        public async Task<ActionResult<GetClaimResponse>> Get([FromRoute] string uniqueClaimReference) {
             return Ok();
         }
 
-        [HttpPatch("{ucr}")]
-        public async Task<IActionResult> UpdateClaim(string ucr, [FromBody] ClaimController updatedClaim) {
+        [HttpPatch("{uniqueClaimReference}")]
+        public async Task<IActionResult> UpdateClaim([FromRoute] string uniqueClaimReference, [FromBody] ClaimController updatedClaim) {
             return Ok();
         }
     }

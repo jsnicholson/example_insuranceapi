@@ -6,7 +6,8 @@ namespace Data.Entities {
     public class Claim {
         [Key]
         [MaxLength(20)]
-        public string UCR { get; set; }
+        [Column("UCR")]
+        public string UniqueClaimReference { get; set; }
         [ForeignKey("Company")]
         public int CompanyId { get; set; }
         public Company? Company { get; set; }
