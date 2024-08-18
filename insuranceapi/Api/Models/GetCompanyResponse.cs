@@ -7,7 +7,7 @@ namespace Api.Models {
 
         public GetCompanyResponse(Company company) {
             this.Company = company;
-            HasActivePolicy = company.Active && company.InsuranceEndDate < DateTime.Now;
+            HasActivePolicy = company.Active && company.InsuranceEndDate > DateTime.Now;
         }
     }
 }

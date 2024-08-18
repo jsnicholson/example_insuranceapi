@@ -1,25 +1,30 @@
 using Api;
 using Api.Exceptions;
-using Api.Handler;
 using Data;
+using Data.Repositories;
+using Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.Design;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString(Constants.Config.INSURANCECONNECTION)));
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<IClaimRepository, ClaimRepository>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-// disabled for now
-/*builder.Services.AddControllers(config => {
-    config.Filters.Add(new RawRequestHandler());
-});*/
+
+builder.Services.AddControllers(config => {
+    // disabled for now
+    //config.Filters.Add(new RawRequestHandler());
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    options.CustomSchemaIds(type => type.FullName);
+});
 
 var app = builder.Build();
 
@@ -39,19 +44,13 @@ using(var scope = app.Services.CreateScope()) {
             new() { Id = 2, Name = "Amazon", Address1 = "2111 7th Avenue", Address2 = "Seattle", Postcode = "WA 98121", Country = "USA", Active = false, InsuranceEndDate = DateTime.Parse("2024-01-01") },
             new() { Id = 3, Name = "Apple", Address1 = "1 Apple Park Way", Address2 = "Cupertino",  Postcode = "CA 95014", Country = "USA", Active = true, InsuranceEndDate = DateTime.Parse("2024-11-01") }
         ]);
-    }
 
-    if(!dbContext.Claims.Any()) {
-        dbContext.Claims.AddRange([
-            new() { UniqueClaimReference = "abcd", CompanyId = 1 }
-            ]);
+        dbContext.SaveChanges();
     }
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

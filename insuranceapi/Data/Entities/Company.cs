@@ -9,9 +9,9 @@ namespace Data.Entities {
         [MaxLength(100)]
         public string Address1 { get; set; }
         [MaxLength(100)]
-        public string Address2 { get; set; }
+        public string? Address2 { get; set; }
         [MaxLength(100)]
-        public string Address3 { get; set; }
+        public string? Address3 { get; set; }
         [MaxLength(20)]
         public string Postcode { get; set; }
         [MaxLength(50)]

@@ -1,4 +1,5 @@
 ﻿using Api.Models;
+using Data.Entities;
 using Data.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -13,6 +14,20 @@ namespace Api.Controllers {
         public ClaimController(ILogger<ClaimController> logger, IClaimRepository claimRepository) {
             _logger = logger;
             _claimRepository = claimRepository;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Claim>>> Get() {
+            _logger.LogInformation($"{HttpContext.Request.Path.Value}");
+            var claims = await _claimRepository.GetAllClaimsAsync();
+
+            if(claims == null || !claims.Any()) {
+                _logger.LogInformation($"{HttpContext.Request.Path.Value} no claims were found");
+                return NotFound();
+            }
+
+            _logger.LogInformation($"{HttpContext.Request.Path.Value} responding:{JsonSerializer.Serialize(claims)}");
+            return Ok(claims);
         }
 
         [HttpGet("{uniqueClaimReference}")]
