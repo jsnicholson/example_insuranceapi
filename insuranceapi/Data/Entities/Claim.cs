@@ -4,9 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Data.Entities {
     [Table("Claims")]
     public class Claim {
+        [Key]
         [MaxLength(20)]
         public string UCR { get; set; }
+        [ForeignKey("Company")]
         public int CompanyId { get; set; }
+        public Company? Company { get; set; }
         public DateTime ClaimDate { get; set; }
         public DateTime LossDate { get; set; }
         [Column("Assured Name")]
