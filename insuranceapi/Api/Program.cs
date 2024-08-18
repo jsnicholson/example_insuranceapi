@@ -1,5 +1,6 @@
 using Api;
 using Api.Exceptions;
+using Api.Handler;
 using Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString(Constants.Config.INSURANCECONNECTION)));
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddControllers();
+// disabled for now
+/*builder.Services.AddControllers(config => {
+    config.Filters.Add(new RawRequestHandler());
+});*/
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

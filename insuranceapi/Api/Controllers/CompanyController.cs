@@ -14,6 +14,7 @@ namespace Api.Controllers {
 
         [HttpGet("{companyId}")]
         public async Task<ActionResult<GetCompanyResponse>> Get(int companyId) {
+
             return Ok();
         }
 
